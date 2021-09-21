@@ -12,6 +12,9 @@ const app = express();
 // Logging middleware
 app.use(morgan('dev'));
 
+// Server static files
+app.use(express.static(__dirname + '/uploads/'));
+
 // JSON req body parser middleware
 app.use(express.json());
 
