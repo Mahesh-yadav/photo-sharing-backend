@@ -28,4 +28,15 @@ export default class Photo {
 
     return photos;
   }
+
+  static async addPhoto(url, title, userId) {
+    const database = db.getDb();
+
+    await database.collection(Photo.collectionName).insertOne({
+      title,
+      url,
+      ownerId: userId,
+      sharedWith: [],
+    });
+  }
 }
