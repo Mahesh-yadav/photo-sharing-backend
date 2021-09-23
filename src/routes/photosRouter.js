@@ -31,6 +31,51 @@ router.get('/shared', async (req, res, next) => {
   }
 });
 
+router.get('/:photoId', async (req, res, next) => {
+  try {
+    const { user_id } = req.user;
+    const { photoId } = req.params;
+
+    const photo = await Photo.getPhoto(photoId);
+
+    if (photo.ownerId === user_id) {
+      const populatedPhoto = await Photo.getPopulatedPhoto(photoId);
+      return res.json({ data: populatedPhoto });
+    } else if (photo.sharedWith.includes(user_id)) {
+      delete photo.sharedWith;
+      return res.json({ data: photo });
+    } else {
+      return res
+        .status(401)
+        .json({ message: 'User not allowed to access photo' });
+    }
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post('/:photoId/share', async (req, res, next) => {
+  try {
+    const { photoId } = req.params;
+    const { user_id } = req.user;
+    const { email } = req.body;
+
+    const photo = await Photo.getPhoto(photoId);
+
+    if (photo.ownerId === user_id) {
+      await Photo.sharePhotoWithUser(photoId, email);
+      const updatedPhoto = await Photo.getPopulatedPhoto(photoId);
+      return res.json({ data: updatedPhoto });
+    } else {
+      return res
+        .status(401)
+        .json({ message: 'User not allowed to share photo' });
+    }
+  } catch (error) {
+    next(error);
+  }
+});
+
 router.post('/upload', async (req, res, next) => {
   try {
     const { user_id } = req.user;
