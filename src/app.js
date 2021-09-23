@@ -2,6 +2,7 @@ import express from 'express';
 import morgan from 'morgan';
 import * as firebase from 'firebase-admin';
 import firebaseCredentials from '../firebase-credentials.json';
+import photosRouter from './routes/photosRouter';
 
 firebase.initializeApp({
   credential: firebase.credential.cert(firebaseCredentials),
@@ -18,8 +19,7 @@ app.use(express.static(__dirname + '/uploads/'));
 // JSON req body parser middleware
 app.use(express.json());
 
-app.get('/', (req, res) => {
-  res.send('Hello!');
-});
+// Mount routers
+app.use('/photos', photosRouter);
 
 export default app;
